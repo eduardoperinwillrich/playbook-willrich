@@ -463,6 +463,13 @@ async function submitForm(){
       body: JSON.stringify(payload),
     });
   } catch(e) { console.error('CRM webhook error', e); }
+  try {
+    await fetch('https://hook.us1.make.celonis.com/jjksq5woebn1iiclmzcg5o2eh5lbrgum', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(payload),
+    });
+  } catch(e) { console.error('Make webhook error', e); }
   closeModal();
   window.open('/playbook.pdf', '_blank');
 }
