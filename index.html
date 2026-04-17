@@ -233,7 +233,7 @@ footer{background:var(--bg);border-top:1px solid rgba(34,197,94,0.08);padding:28
     <div class="modal-sub">Acesso imediato · 100% gratuito · Sem cartão</div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Nome</label><input type="text" id="pb-nome" class="form-input" placeholder="Seu nome"></div>
-      <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" id="pb-telefone" class="form-input" placeholder="(11) 99999-9999"></div>
+      <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" id="pb-telefone" class="form-input" placeholder="(11) 99999-9999" oninput="maskTel(this)" maxlength="15"></div>
     </div>
     <div class="form-group"><label class="form-label">E-mail</label><input type="email" id="pb-email" class="form-input" placeholder="seu@email.com"></div>
     <div class="form-group"><label class="form-label">Receita mensal</label>
@@ -411,13 +411,46 @@ footer{background:var(--bg);border-top:1px solid rgba(34,197,94,0.08);padding:28
 function openModal(){document.getElementById('modal').classList.add('active');document.body.style.overflow='hidden';}
 function closeModal(){document.getElementById('modal').classList.remove('active');document.body.style.overflow='';}
 function closeOut(e){if(e.target===document.getElementById('modal'))closeModal();}
+function maskTel(el){
+  let v=el.value.replace(/\D/g,'');
+  if(v.length>11)v=v.slice(0,11);
+  if(v.length>6)v=v.replace(/(\d{2})(\d{5})(\d{0,4})/,'($1) $2-$3');
+  else if(v.length>2)v=v.replace(/(\d{2})(\d{0,5})/,'($1) $2');
+  else if(v.length>0)v=v.replace(/(\d{0,2})/,'($1');
+  el.value=v;
+}
+function showError(id,msg){
+  const el=document.getElementById(id);
+  el.style.borderColor='#ef4444';
+  el.style.boxShadow='0 0 0 3px rgba(239,68,68,0.15)';
+  if(!el.nextElementSibling||!el.nextElementSibling.classList.contains('field-error')){
+    const e=document.createElement('div');
+    e.className='field-error';
+    e.style.cssText='color:#ef4444;font-size:11px;font-family:JetBrains Mono,monospace;margin-top:4px;';
+    e.textContent=msg;
+    el.parentNode.insertBefore(e,el.nextSibling);
+  }
+}
+function clearErrors(){
+  document.querySelectorAll('.form-input,.form-select').forEach(el=>{
+    el.style.borderColor='';el.style.boxShadow='';
+  });
+  document.querySelectorAll('.field-error').forEach(e=>e.remove());
+}
 async function submitForm(){
-  const nome = document.getElementById('pb-nome')?.value?.trim();
-  if(!nome){alert('Por favor, informe seu nome.');return;}
+  clearErrors();
+  const nome     = document.getElementById('pb-nome')?.value?.trim();
+  const telefone = document.getElementById('pb-telefone')?.value?.trim();
+  const email    = document.getElementById('pb-email')?.value?.trim();
+  let ok=true;
+  if(!nome){showError('pb-nome','Informe seu nome');ok=false;}
+  if(!telefone||telefone.replace(/\D/g,'').length<10){showError('pb-telefone','Informe um WhatsApp válido');ok=false;}
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showError('pb-email','Informe um e-mail válido');ok=false;}
+  if(!ok)return;
   const payload = {
     nome,
-    telefone: document.getElementById('pb-telefone')?.value?.trim() || '',
-    email:    document.getElementById('pb-email')?.value?.trim() || '',
+    telefone,
+    email,
     faturamento: document.getElementById('pb-faturamento')?.value || '',
     cargo:    document.getElementById('pb-cargo')?.value || '',
     segmento: document.getElementById('pb-segmento')?.value || '',
