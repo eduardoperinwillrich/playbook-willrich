@@ -463,8 +463,8 @@ async function submitForm(){
       body: JSON.stringify(payload),
     });
   } catch(e) { console.error('CRM webhook error', e); }
-  alert('Obrigado! Você receberá o Playbook em breve.');
   closeModal();
+  window.open('/playbook.pdf', '_blank');
 }
 function tf(btn){const i=btn.parentElement;const o=i.classList.contains('open');document.querySelectorAll('.faq-item').forEach(x=>x.classList.remove('open'));if(!o)i.classList.add('open');}
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}},{threshold:0.1}));
