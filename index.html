@@ -232,17 +232,17 @@ footer{background:var(--bg);border-top:1px solid rgba(34,197,94,0.08);padding:28
     <div class="modal-title">Informe seus dados</div>
     <div class="modal-sub">Acesso imediato · 100% gratuito · Sem cartão</div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">Nome</label><input type="text" class="form-input" placeholder="Seu nome"></div>
-      <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" class="form-input" placeholder="(11) 99999-9999"></div>
+      <div class="form-group"><label class="form-label">Nome</label><input type="text" id="pb-nome" class="form-input" placeholder="Seu nome"></div>
+      <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" id="pb-telefone" class="form-input" placeholder="(11) 99999-9999"></div>
     </div>
-    <div class="form-group"><label class="form-label">E-mail</label><input type="email" class="form-input" placeholder="seu@email.com"></div>
+    <div class="form-group"><label class="form-label">E-mail</label><input type="email" id="pb-email" class="form-input" placeholder="seu@email.com"></div>
     <div class="form-group"><label class="form-label">Receita mensal</label>
-      <select class="form-select"><option value="" disabled selected>Selecione</option><option>Até R$ 50 mil</option><option>R$ 50k – R$ 200k</option><option>R$ 200k – R$ 500k</option><option>Acima de R$ 500k</option></select></div>
+      <select id="pb-faturamento" class="form-select"><option value="" disabled selected>Selecione</option><option>Até R$ 50 mil</option><option>R$ 50k – R$ 200k</option><option>R$ 200k – R$ 500k</option><option>Acima de R$ 500k</option></select></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Cargo</label>
-        <select class="form-select"><option value="" disabled selected>Cargo</option><option>CEO / Fundador</option><option>Diretor Comercial</option><option>Gerente de Vendas</option><option>Outro</option></select></div>
+        <select id="pb-cargo" class="form-select"><option value="" disabled selected>Cargo</option><option>CEO / Fundador</option><option>Diretor Comercial</option><option>Gerente de Vendas</option><option>Outro</option></select></div>
       <div class="form-group"><label class="form-label">Segmento</label>
-        <select class="form-select"><option value="" disabled selected>Segmento</option><option>Indústria</option><option>Serviços B2B</option><option>Tecnologia</option><option>Varejo</option><option>Outro</option></select></div>
+        <select id="pb-segmento" class="form-select"><option value="" disabled selected>Segmento</option><option>Indústria</option><option>Serviços B2B</option><option>Tecnologia</option><option>Varejo</option><option>Outro</option></select></div>
     </div>
     <button class="form-submit" onclick="submitForm()">▶ ACESSAR PLAYBOOK GRATUITO</button>
     <div class="modal-free">🔒 SEGURO · <span>100% GRATUITO</span> · SEM SPAM</div>
@@ -413,7 +413,28 @@ footer{background:var(--bg);border-top:1px solid rgba(34,197,94,0.08);padding:28
 function openModal(){document.getElementById('modal').classList.add('active');document.body.style.overflow='hidden';}
 function closeModal(){document.getElementById('modal').classList.remove('active');document.body.style.overflow='';}
 function closeOut(e){if(e.target===document.getElementById('modal'))closeModal();}
-function submitForm(){fbq('track', 'Lead');alert('Obrigado! Você receberá o Playbook em breve.');closeModal();}
+async function submitForm(){
+  const nome = document.getElementById('pb-nome')?.value?.trim();
+  if(!nome){alert('Por favor, informe seu nome.');return;}
+  const payload = {
+    nome,
+    telefone: document.getElementById('pb-telefone')?.value?.trim() || '',
+    email:    document.getElementById('pb-email')?.value?.trim() || '',
+    faturamento: document.getElementById('pb-faturamento')?.value || '',
+    cargo:    document.getElementById('pb-cargo')?.value || '',
+    segmento: document.getElementById('pb-segmento')?.value || '',
+  };
+  fbq('track', 'Lead');
+  try {
+    await fetch('https://crm.eduardowillrich.com.br/api/v1/webhook/playbook', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','X-Webhook-Secret':'49106f0b209330f0d4cc20fc6897f34476a797154832d271bdcb11774ace07d9'},
+      body: JSON.stringify(payload),
+    });
+  } catch(e) { console.error('CRM webhook error', e); }
+  alert('Obrigado! Você receberá o Playbook em breve.');
+  closeModal();
+}
 function tf(btn){const i=btn.parentElement;const o=i.classList.contains('open');document.querySelectorAll('.faq-item').forEach(x=>x.classList.remove('open'));if(!o)i.classList.add('open');}
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}},{threshold:0.1}));
 document.querySelectorAll('.pilar,.ent-card,.prova-card,.res-card').forEach(el=>{el.style.opacity='0';el.style.transform='translateY(16px)';el.style.transition='opacity 0.5s ease,transform 0.5s ease';obs.observe(el);});
