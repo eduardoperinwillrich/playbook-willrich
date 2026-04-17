@@ -413,7 +413,7 @@ footer{background:var(--bg);border-top:1px solid rgba(34,197,94,0.08);padding:28
 function openModal(){document.getElementById('modal').classList.add('active');document.body.style.overflow='hidden';}
 function closeModal(){document.getElementById('modal').classList.remove('active');document.body.style.overflow='';}
 function closeOut(e){if(e.target===document.getElementById('modal'))closeModal();}
-function submitForm(){alert('Obrigado! Você receberá o Playbook em breve.');closeModal();}
+function submitForm(){fbq('track', 'Lead');alert('Obrigado! Você receberá o Playbook em breve.');closeModal();}
 function tf(btn){const i=btn.parentElement;const o=i.classList.contains('open');document.querySelectorAll('.faq-item').forEach(x=>x.classList.remove('open'));if(!o)i.classList.add('open');}
 const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.style.opacity='1';e.target.style.transform='translateY(0)';}},{threshold:0.1}));
 document.querySelectorAll('.pilar,.ent-card,.prova-card,.res-card').forEach(el=>{el.style.opacity='0';el.style.transform='translateY(16px)';el.style.transition='opacity 0.5s ease,transform 0.5s ease';obs.observe(el);});
